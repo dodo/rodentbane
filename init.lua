@@ -166,7 +166,7 @@ end
 
 --- Move the navigation area in a direction.
 -- @param dir Direction to move to {"up", "right", "down", "left"}.
--- @param ratio Ratio of movement, multiplied by the size of the current area, 
+-- @param ratio Ratio of movement, multiplied by the size of the current area,
 -- defaults to 0.5 (ie. half the area size.
 function move(dir, ratio)
     -- Store previous area
@@ -208,7 +208,7 @@ end
 -- @param evtype Pressed or released event.
 function keyevent(modkeys, key, evtype)
     -- Ignore release events and modifier keys
-    if evtype == "release" 
+    if evtype == "release"
        or key == "Shift_L"
        or key == "Shift_R"
        or key == "Control_L"
@@ -273,7 +273,7 @@ end
 function table_equals(t1, t2)
     -- Check first table
     for i, item in ipairs(t1) do
-        if item ~= "Mod2" and 
+        if item ~= "Mod2" and
            awful.util.table.hasitem(t2, item) == nil then
             -- An unequal item was found
             return false
@@ -282,7 +282,7 @@ function table_equals(t1, t2)
 
     -- Check second table
     for i, item in ipairs(t2) do
-        if item ~= "Mod2" and 
+        if item ~= "Mod2" and
            awful.util.table.hasitem(t1, item) == nil then
             -- An unequal item was found
             return false
@@ -310,7 +310,7 @@ function click(button)
     -- TODO: Figure out a way to use fake_input for clicks
     --capi.root.fake_input("button_press", button)
     --capi.root.fake_input("button_release", button)
-    
+
     -- Use xdotool when available, otherwise try xte
     command = "xdotool click "..b.." &> /dev/null"
       .." || xte 'mouseclick "..b.."' &> /dev/null"
@@ -347,16 +347,16 @@ function binddefault()
 
     -- Undo with u
     bind({}, "u", undo)
-    
+
     -- Left click with space
-    bind({}, "Space", function () 
+    bind({}, "Space", function ()
         warp()
         click()
         stop()
     end)
-    
+
     -- Double Left click with alt+space
-    bind({"Mod1"}, "Space", function () 
+    bind({"Mod1"}, "Space", function ()
         warp()
         click()
         click()
@@ -364,28 +364,28 @@ function binddefault()
     end)
 
     -- Middle click with Control+space
-    bind({"Control"}, "Space", function () 
+    bind({"Control"}, "Space", function ()
         warp()
         click(2)
         stop()
     end)
 
     -- Right click with shift+space
-    bind({"Shift"}, "Space", function () 
+    bind({"Shift"}, "Space", function ()
         warp()
         click(3)
         stop()
     end)
 
     -- Only warp with return
-    bind({}, "Return", function () 
+    bind({}, "Return", function ()
         warp()
     end)
 end
 
 --- Start the navigation sequence.
 -- @param screen Screen to start navigation on, defaults to current screen.
--- @param recall Whether the previous area should be recalled (defaults to 
+-- @param recall Whether the previous area should be recalled (defaults to
 -- false).
 function start(screen, recall)
     -- Default to current screen
