@@ -39,7 +39,6 @@ local capi =
     titlebar = titlebar,
     widget = widget,
     hooks = hooks,
-    keygrabber = keygrabber,
     wibox = wibox,
     widget = widget,
 }
@@ -415,7 +414,7 @@ function start(screen, recall)
     current.screen = scr
 
     -- Start the keygrabber
-    capi.keygrabber.run(keyevent)
+    awful.keygrabber.run(keyevent)
 
     -- Draw the box
     draw()
@@ -424,7 +423,7 @@ end
 --- Stop the navigation sequence without doing anything.
 function stop()
     -- Stop the keygrabber
-    capi.keygrabber.stop()
+    awful.keygrabber.stop(keyevent)
 
     -- Hide all wiboxes
     for border, box in pairs(wiboxes) do
