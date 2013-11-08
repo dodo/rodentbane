@@ -4,49 +4,22 @@
 -- Licensed under the WTFPL
 ----------------------------------------------------------------------------
 
--- Load awful
-require("awful")
-
--- Load beautiful
-require("beautiful")
 
 ---- {{{ Grab environment
-local ipairs = ipairs
-local pairs = pairs
-local print = print
-local type = type
-local tonumber = tonumber
-local tostring = tostring
-local unpack = unpack
-local math = math
-local table = table
-local awful = awful
-local os = os
-local io = io
-local string = string
-local awful = awful
-local beautiful = beautiful
-
+local awful = require("awful")
+local wibox = require("wibox")
+local beautiful = require("beautiful")
 -- Grab C API
-local capi =
-{
+local capi = {
     root = root,
-    awesome = awesome,
     screen = screen,
-    client = client,
     mouse = mouse,
-    button = button,
-    titlebar = titlebar,
-    widget = widget,
-    hooks = hooks,
-    wibox = wibox,
-    widget = widget,
 }
 
 -- }}}
 
 --- Utilities for controlling the cursor
-module("rodentbane")
+rodentbane = {}
 
 -- Local data
 local bindings = {}
@@ -54,8 +27,37 @@ local history = {}
 local current = nil
 local wiboxes = nil
 
+
+--- Check if two tables have the same values.
+-- @param t1 First table to check.
+-- @param t2 Second table to check.
+-- @return True if the tables are equivalent, false otherwise.
+function table_equals(t1, t2)
+    -- Check first table
+    for i, item in ipairs(t1) do
+        if item ~= "Mod2" and
+           awful.util.table.hasitem(t2, item) == nil then
+            -- An unequal item was found
+            return false
+        end
+    end
+
+    -- Check second table
+    for i, item in ipairs(t2) do
+        if item ~= "Mod2" and
+           awful.util.table.hasitem(t1, item) == nil then
+            -- An unequal item was found
+            return false
+        end
+    end
+
+    -- All items were equal
+    return true
+end
+
 --- Create the wiboxes to display.
 function init()
+    local theme = beautiful.get()
     -- Wiboxes table
     wiboxes = {}
 
@@ -64,31 +66,28 @@ function init()
 
     -- Create wibox for each border
     for i, border in ipairs(borders) do
-        wiboxes[border] = capi.wibox({
-            bg = beautiful.rodentbane_bg or beautiful.border_focus or "#C50B0B",
+        wiboxes[border] = wibox({
+            bg = theme.rodentbane_bg or theme.border_focus or "#C50B0B",
             ontop = true,
         })
+        wiboxes[border].visible = true
     end
 end
 
 --- Draw the guidelines on screen using wiboxes.
 -- @param area The area of the screen to draw on, defaults to current area.
 function draw(area)
+    local theme = beautiful.get()
     -- Default to current area
     local ar = area or current
 
     -- Get numbers
-    local rwidth = beautiful.rodentbane_width or 2
+    local rwidth = theme.rodentbane_width or 2
 
     -- Stop if the area is too small
     if ar.width < rwidth*3 or ar.height < rwidth*3 then
         stop()
         return false
-    end
-
-    -- Put the wiboxes on the correct screen
-    for border, box in pairs(wiboxes) do
-        box.screen = ar.screen
     end
 
     -- Horizontal border
@@ -138,6 +137,12 @@ function draw(area)
         height = rwidth,
         width = ar.width,
     })
+
+    -- Put the wiboxes on the correct screen
+    for border, box in pairs(wiboxes) do
+        box.screen = ar.screen
+        box.draw()
+    end
 end
 
 --- Cut the navigation area into a direction.
@@ -263,33 +268,6 @@ function keyevent(modkeys, key, evtype)
     -- No key was found, stop grabbing
     stop()
     return false
-end
-
---- Check if two tables have the same values.
--- @param t1 First table to check.
--- @param t2 Second table to check.
--- @return True if the tables are equivalent, false otherwise.
-function table_equals(t1, t2)
-    -- Check first table
-    for i, item in ipairs(t1) do
-        if item ~= "Mod2" and
-           awful.util.table.hasitem(t2, item) == nil then
-            -- An unequal item was found
-            return false
-        end
-    end
-
-    -- Check second table
-    for i, item in ipairs(t2) do
-        if item ~= "Mod2" and
-           awful.util.table.hasitem(t1, item) == nil then
-            -- An unequal item was found
-            return false
-        end
-    end
-
-    -- All items were equal
-    return true
 end
 
 --- Warp the mouse to the center of the navigation area
@@ -427,6 +405,16 @@ function stop()
 
     -- Hide all wiboxes
     for border, box in pairs(wiboxes) do
+        box.visible = false
         box.screen = nil
     end
+    print "stop"
 end
+
+for _, name in ipairs({'init','draw','cut','move','bind','keyevent','warp',
+                       'click','undo','binddefault','start','stop'}) do
+    rodentbane[name] = _G[name]
+end
+
+return rodentbane
+
