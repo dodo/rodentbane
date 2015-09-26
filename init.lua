@@ -408,6 +408,8 @@ function stop()
         box.visible = false
         box.screen = nil
     end
+    init()
+    
     print "stop"
 end
 
